@@ -80,12 +80,12 @@ int GetSvrMacAddress() {
  			char macaddr[100];
  			sprintf(macaddr, "[%s] %02X:%02X:%02X:%02X:%02X:%02X",
  				r->ifr_name,
- 				(unsigned char)r->ifr_hwaddr.sa_data[0],
- 				(unsigned char)r->ifr_hwaddr.sa_data[1],
- 				(unsigned char)r->ifr_hwaddr.sa_data[2],
- 				(unsigned char)r->ifr_hwaddr.sa_data[3],
- 				(unsigned char)r->ifr_hwaddr.sa_data[4],
- 				(unsigned char)r->ifr_hwaddr.sa_data[5]);
+ 				(uint8_t)r->ifr_hwaddr.sa_data[0],
+ 				(uint8_t)r->ifr_hwaddr.sa_data[1],
+ 				(uint8_t)r->ifr_hwaddr.sa_data[2],
+ 				(uint8_t)r->ifr_hwaddr.sa_data[3],
+ 				(uint8_t)r->ifr_hwaddr.sa_data[4],
+ 				(uint8_t)r->ifr_hwaddr.sa_data[5]);
  			return 0;
  		}
  	}
