@@ -171,7 +171,6 @@ whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	bpf_u_int32 netSniff;
 	const u_char *packet;
 	packet = pcap_next(handle, &pcPktHdr);
-	char filtering[] = "arp";
 	arpRequest(handle, attackerMAC, tIP); //sending the req
 
 	//pck--->grab!
