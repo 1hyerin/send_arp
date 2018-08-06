@@ -40,9 +40,6 @@ void usage() {
 	printf("Usage: send_arp <interface> <sender ip> <target ip>\n");
 }
 
-
-
-
 /* ==========================WHOLE HEADER=============================== */
 struct eth_hdr {
 	uint8_t ethdest[ETH_ALEN]; /* Destination MAC Address */
@@ -75,11 +72,11 @@ typedef struct {
     uint8_t w_hlen; /* Hardware Address Length */ 
     uint8_t w_plen; /* Protocol Address Length */ 
     uint16_t w_oper; /* Operation Code */ 
-    unsigned char w_sha[ARP_HWADD]; /* Sender hardware address */ 
-    unsigned char w_spa[ARP_IPLEN]; /* Sender IP address */ 
-    unsigned char w_tha[ARP_HWADD]; /* Target hardware address */ 
-    unsigned char w_tpa[ARP_IPLEN]; /* Target IP address */ 
-    unsigned char w_padding[ARP_PADD];
+    uint8_t w_sha[ARP_HWADD]; /* Sender hardware address */ 
+    uint8_t w_spa[ARP_IPLEN]; /* Sender IP address */ 
+    uint8_t w_tha[ARP_HWADD]; /* Target hardware address */ 
+    uint8_t w_tpa[ARP_IPLEN]; /* Target IP address */ 
+    uint8_t w_padding[ARP_PADD];
 } whole_hdr;
 
 //sending: codes are at the below------------------------------------------
@@ -159,14 +156,12 @@ void arpReply(pcap_t * handle, uint8_t * ownEthernet, uint8_t * destin_eth, uint
 	packet.w_plen = 4;
 }
 
-
 int main(int argc, char* argv[]) {
     if (argc != 4) {
         usage();
         return 0;
     }
 }
-
 
 whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	struct pcap_pkthdr pcPktHdr;
@@ -186,9 +181,11 @@ whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	packet = pcap_next(handle, &pcPktHdr);
 	char filtering[] = "arp";
 
+
 	arpRequest(handle, attackerMAC, tIP); //sending the req
 
 	//pck--->grab!
+
 	arpSend = (whole_hdr *)(packet);
 	for(int i=0; i<CHK_LEN; i++) {
 		printf("%02x:", arpSend->w_sha[i]);
