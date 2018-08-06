@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
     }
 }
 
-whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
+whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	struct pcap_pkthdr pcPktHdr;
 	/* struct pcap_pkthdr {
         struct timeval ts; //time stamp
