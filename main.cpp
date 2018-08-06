@@ -113,7 +113,7 @@ int getMacAddr(char * intfInput, char * buf) {
 /* ---------------------------------------------------------------------------------------- */
 
 /* --------------2. arp request----------------- */
-void arpRequest(pcap_t* handle, char* attackerMAC, uint8_t * tIPget) {
+void arpRequest(pcap_t* handle, uint8_t* attackerMAC, uint8_t * tIPget) {
 	whole_hdr pktReq;
 	pktReq.w_e_type = ETHERTYPE_ARP;
 
