@@ -81,14 +81,9 @@ typedef struct {
 
 //sending: codes are at the below------------------------------------------
 whole_hdr * getMAC (pcap_t * handle, uint8_t * attackerMAC, uint8_t * tIP);
-
 /* ==================================================================== */
 
-
-
-
 /* ============================ NEEDED ================================ */
-
 /* --------------1. Checking the right input of the interface is needed!----------------- */
 int getMacAddr(char * intfInput, char * buf) {
 	char intfName[INPUT_LENGTH];
@@ -170,25 +165,19 @@ whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
         bpf_u_int32 caplen; //length of portion present 
         bpf_u_int32 len; //length this packet (off wire) 
 	};*/
-
 	struct bpf_program bpfPro;
 	//filtering structure! It can compile, and use it!
-
 	whole_hdr * arpSend;
-
 	bpf_u_int32 netSniff;
 	const u_char *packet;
 	packet = pcap_next(handle, &pcPktHdr);
 	char filtering[] = "arp";
-
-
 	arpRequest(handle, attackerMAC, tIP); //sending the req
 
 	//pck--->grab!
-
 	arpSend = (whole_hdr *)(packet);
 	for(int i=0; i<CHK_LEN; i++) {
 		printf("%02x:", arpSend->w_sha[i]);
 	}	
-	return arpSend -> w_sha;
+	arpSend -> w_sha;
 }
