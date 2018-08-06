@@ -34,7 +34,7 @@
 #define INPUT_LENGTH 100
 
 const char* broad_eth_cast = "\xff\xff\xff\xff\xff\xff";
-uint8_t	null_get_eth[] = {0, 0, 0, 0, 0, 0};
+uint8_t null_get_eth[] = {0, 0, 0, 0, 0, 0};
 
 void usage() {
 	printf("Usage: send_arp <interface> <sender ip> <target ip>\n");
@@ -130,8 +130,7 @@ void arpRequest(pcap_t* handle, uint8_t* attackerMAC, uint8_t * tIPget) {
 /* --------------------------------------------- */
 
 /* ------------- 3.arp reply --------------------*/
-void arpReply(pcap_t * handle, uint8_t * ownEthernet, uint8_t * destin_eth, uint8_t * destin_ip)
-{
+void arpReply(pcap_t * handle, uint8_t * ownEthernet, uint8_t * destin_eth, uint8_t * destin_ip) {
 	whole_hdr packet;
 	packet.w_e_type = ETHERTYPE_ARP;
 
