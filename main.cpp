@@ -167,7 +167,7 @@ whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	struct bpf_program bpfPro;
 	//filtering structure! It can compile, and use it!
 	whole_hdr * arpSend;
-	bpf_u_int32 netSniff;
+	uint32_t netSniff;
 	const u_char *packet;
 	packet = pcap_next(handle, &pcPktHdr);
 	arpRequest(handle, attackerMAC, tIP); //sending the req
