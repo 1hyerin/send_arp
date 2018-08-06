@@ -16,22 +16,32 @@
 
 #define ETH_ALEN 6
 #define ETH_SIZE 14
+#define ARP_HWADD 6
+#define ARP_IPLEN 4
 
 void usage() {
 	printf("Usage: send_arp <interface> <sender ip> <target ip>\n");
 }
 
 struct ethhdr {
-	uint8_t ethdest[ETH_ALEN];	// Destination MAC Address
-	uint8_t ethsrc[ETH_ALEN];	// Source MAC Address
+	uint8_t ethdest[ETH_ALEN]; // Destination MAC Address
+	uint8_t ethsrc[ETH_ALEN]; // Source MAC Address
 	uint16_t e_type;
 };
 
-struct arp_hdr {
-    uint16_t hwtype;
-    uint16_t protype;
-    uint32_t hwsize;
-    uint32_t prosize;
-    uint16_t opcode;
-    uint32_t data;
+
+//ARP Header
+#define ARP_REQUEST 1 /* ARP Request */ 
+#define ARP_REPLY 2 /* ARP Reply */ 
+struct arphdr {
+	uint16_t htype; /* Hardware Type */ 
+    uint16_t ptype; /* Protocol Type */ 
+    uint8_t hlen; /* Hardware Address Length */ 
+    uint8_t plen; /* Protocol Address Length */ 
+    uint16_t oper; /* Operation Code */ 
+    uint8_t sha[ARP_HWADD]; /* Sender hardware address */ 
+    uint8_t spa[ARP_IPLEN]; /* Sender IP address */ 
+    uint8_t tha[ARP_HWADD]; /* Target hardware address */ 
+    uint8_t tpa[ARP_IPLEN]; /* Target IP address */ 
 };
+
