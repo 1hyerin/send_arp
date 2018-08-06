@@ -54,7 +54,7 @@ struct eth_hdr {
 #define ARP_REQUEST 1 /* ARP Request */ 
 #define ARP_REPLY 2 /* ARP Reply */ 
 struct arp_hdr {
-	uint16_t htype; /* Hardware Type */ 
+    uint16_t htype; /* Hardware Type */ 
     uint16_t ptype; /* Protocol Type */ 
     uint8_t hlen; /* Hardware Address Length */ 
     uint8_t plen; /* Protocol Address Length */ 
@@ -169,13 +169,11 @@ int main(int argc, char* argv[]) {
 
 
 whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
-
-
 	struct pcap_pkthdr pcPktHdr;
 	/* struct pcap_pkthdr {
-    struct timeval ts; //time stamp
-    bpf_u_int32 caplen; //length of portion present 
-    bpf_u_int32 len; //length this packet (off wire) 
+        struct timeval ts; //time stamp
+        bpf_u_int32 caplen; //length of portion present 
+        bpf_u_int32 len; //length this packet (off wire) 
 	};*/
 
 	struct bpf_program bpfPro;
@@ -188,15 +186,12 @@ whole_hdr * getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 	packet = pcap_next(handle, &pcPktHdr);
 	char filtering[] = "arp";
 
-
 	arpRequest(handle, attackerMAC, tIP); //sending the req
 
 	//pck--->grab!
-
 	arpSend = (whole_hdr *)(packet);
 	for(int i=0; i<CHK_LEN; i++) {
 		printf("%02x:", arpSend->w_sha[i]);
-	}
-	
+	}	
 	return arpSend -> w_sha;
 }
