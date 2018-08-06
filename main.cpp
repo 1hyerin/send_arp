@@ -174,8 +174,6 @@ whole_hdr *getMAC(pcap_t *handle, uint8_t* attackerMAC, uint8_t* tIP) {
 
 	//pck--->grab!
 	arpSend = (whole_hdr *)(packet);
-	for(int i=0; i<CHK_LEN; i++) {
-		printf("%02x:", arpSend->w_sha[i]);
-	}	
+	for(int i=0; i<CHK_LEN; i++)   printf("%02x:", arpSend->w_sha[i]);	
 	arpSend -> w_sha;
 }
